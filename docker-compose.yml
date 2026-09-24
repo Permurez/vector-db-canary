@@ -1,0 +1,42 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      # Wirtualny wolumen na dane i wstrzyknięcie konfiguracji
+      - prometheus_data:/prometheus 
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+
+  canary:
+    image: python:3.11-slim
+    container_name: canary_script
+    depends_on:
+      - qdrant
+      - prometheus
+
+# Ta sekcja musi przylegać do lewej krawędzi
+volumes:
+  qdrant_data:
+  prometheus_data:
