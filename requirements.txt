@@ -1,2 +1,4 @@
-qdrant-client==1.7.3
-prometheus-client==0.19.0
+qdrant-client==1.7.3 #Official client for Qdrant vector database communication
+prometheus-client==0.19.0 #Exposing metrics for monitoring and scraping 
+sentence-transformers==2.3.1 #Local AI model (for now all-MiniLM-L6-v2) for vector embeddings generation
+datasets==2.16.1 #Downloading and managing SQuAD dataset
