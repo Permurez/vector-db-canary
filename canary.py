@@ -60,7 +60,7 @@ def main() -> None:
                 CANARY_HEALTH.set(0)
                 logger.warning("Canary warning: Query returned empty results.")
 
-        except Exception as e:
+        except Exception as e: # noqa: BLE001
             logger.error(f"Canary check failed: {e}")
             CANARY_HEALTH.set(0)
 
