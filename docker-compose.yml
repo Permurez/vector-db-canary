@@ -1,4 +1,5 @@
 services:
+# Qdrant service for vector search and storage
   qdrant:
     image: qdrant/qdrant:latest
     container_name: qdrant
@@ -12,14 +13,14 @@ services:
         limits:
           cpus: '0.5'
           memory: 1G
-
+# Prometheus service for monitoring the Qdrant instance
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
-      # Wirtualny wolumen na dane i wstrzyknięcie konfiguracji
+      # Volume for Prometheus data and configuration
       - prometheus_data:/prometheus 
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     restart: unless-stopped
@@ -29,6 +30,7 @@ services:
           cpus: '0.25'
           memory: 512M
 
+# Canary service for testing the Qdrant instance and Prometheus monitoring
   canary:
     image: python:3.11-slim
     container_name: canary_script
@@ -36,7 +38,6 @@ services:
       - qdrant
       - prometheus
 
-# Ta sekcja musi przylegać do lewej krawędzi
 volumes:
   qdrant_data:
   prometheus_data:
