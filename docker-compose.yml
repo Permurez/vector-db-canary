@@ -36,8 +36,19 @@ services:
     container_name: canary_script
     depends_on:
       - qdrant
-      - prometheus
+    environment:
+      - CURL_CA_BUNDLE=
+      - REQUESTS_CA_BUNDLE=
+    volumes:
+      - .:/app
+      - pip_cache:/root/.cache/pip
+      - hf_cache:/root/.cache/huggingface
+    working_dir: /app
+    command: >
+      sh -c "pip install -r requirements.txt && python canary.py"
 
 volumes:
   qdrant_data:
   prometheus_data:
+  pip_cache:
+  hf_cache:
