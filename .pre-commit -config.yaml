@@ -1,0 +1,16 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace #detects and removes trailing whitespace
+      - id: end-of-file-fixer #detects and fixes missing or extra empty lines at the end of files
+      - id: check-yaml #detects syntax errors in YAML files
+      - id: check-added-large-files #detects large files that are added to the repository
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.2.0
+    hooks:
+      #Run Ruff with --fix to automatically fix issues
+      - id: ruff
+        args: [--fix]
+      - id: format

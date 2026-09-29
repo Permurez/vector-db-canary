@@ -13,6 +13,21 @@ services:
         limits:
           cpus: '0.5'
           memory: 1G
+  # One-shot ingestion job that creates and populates the collection
+  ingest:
+    image: python:3.11-slim
+    container_name: vector_db_ingest
+    depends_on:
+      - qdrant
+    volumes:
+      - .:/app
+      - pip_cache:/root/.cache/pip
+      - hf_cache:/root/.cache/huggingface
+    working_dir: /app
+    command: >
+      sh -c "pip install --default-timeout=100 -r requirements.txt &&
+      until python -c \"import socket; socket.create_connection(('qdrant',6333),1)\";
+      do sleep 2; done && python ingest.py"
 # Prometheus service for monitoring the Qdrant instance
   prometheus:
     image: prom/prometheus:latest
@@ -34,21 +49,42 @@ services:
   canary:
     image: python:3.11-slim
     container_name: canary_script
+    restart: unless-stopped
     depends_on:
-      - qdrant
+      ingest:
+        condition: service_completed_successfully
     environment:
       - CURL_CA_BUNDLE=
       - REQUESTS_CA_BUNDLE=
-    volumes:
+    volumes: #Those volumes are used to persist data and cache dependencies
       - .:/app
       - pip_cache:/root/.cache/pip
       - hf_cache:/root/.cache/huggingface
     working_dir: /app
     command: >
-      sh -c "pip install -r requirements.txt && python canary.py"
+      sh -c "pip install --default-timeout=100 -r requirements.txt && python canary.py"
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
 
-volumes:
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+volumes: # Volumes for persistent data storage
   qdrant_data:
   prometheus_data:
   pip_cache:
   hf_cache:
+  grafana_data:

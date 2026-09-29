@@ -30,6 +30,18 @@ def main() -> None:
     logger.info(f"Starting Prometheus metrics server on port {config.PROMETHEUS_PORT}...")
     start_http_server(config.PROMETHEUS_PORT)
 
+   # time.sleep(20) # Wait for Qdrant to be ready before starting the canary loop
+    logger.info("Oczekiwanie na gotowość bazy Qdrant...")
+    while True:
+        try:
+            temp_client = QdrantClient(host=config.QDRANT_HOST, port=config.QDRANT_PORT)
+            temp_client.get_collections() # test query to check if Qdrant is ready
+            logger.info("Qdrant jest gotowy!")
+            break
+        except Exception:
+            logger.warning("Qdrant jeszcze niedostępny, ponawiam próbę za 3 sekundy...")
+            time.sleep(3)
+
     client = QdrantClient(host=config.QDRANT_HOST, port=config.QDRANT_PORT)
     model = SentenceTransformer(config.MODEL_NAME)
 
