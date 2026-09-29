@@ -38,9 +38,9 @@ def main() -> None:
             temp_client.get_collections() # test query to check if Qdrant is ready
             logger.info("Qdrant jest gotowy!")
             break
-        except Exception:
-            logger.warning("Qdrant jeszcze niedostępny, ponawiam próbę za 3 sekundy...")
-            time.sleep(3)
+        except Exception:# noqa: BLE001
+            logger.warning("Qdrant not ready yet, retrying in 5 seconds...")
+            time.sleep(5)
 
     client = QdrantClient(host=config.QDRANT_HOST, port=config.QDRANT_PORT)
     model = SentenceTransformer(config.MODEL_NAME)
