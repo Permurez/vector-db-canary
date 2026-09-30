@@ -52,7 +52,7 @@ services:
     restart: unless-stopped
     depends_on:
       ingest:
-        condition: service_completed_successfully
+        condition: service_started
     environment:
       - CURL_CA_BUNDLE=
       - REQUESTS_CA_BUNDLE=
@@ -76,6 +76,9 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
     restart: unless-stopped
     deploy:
       resources:

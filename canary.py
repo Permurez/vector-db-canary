@@ -11,7 +11,7 @@ import config
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-CHECK_INTERVAL_SECONDS = 15
+CHECK_INTERVAL_SECONDS = 1
 
 CANARY_QUERIES = [
     "What is the history of the universe?",
